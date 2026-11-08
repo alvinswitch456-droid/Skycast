@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101a35">
+<meta name="description" content="SkyCast — clear, helpful weather for everywhere.">
+<title>SkyCast — Weather, made clearer</title>
+<link rel="preconnect" href="https://api.open-meteo.com">
+<link rel="preconnect" href="https://geocoding-api.open-meteo.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#edf3fb;--panel:rgba(255,255,255,.82);--panel2:#fff;--ink:#14213d;--muted:#62708a;--line:rgba(32,55,91,.12);--accent:#3678f6;--accent2:#6a55e8;--shadow:0 16px 45px rgba(31,56,98,.10)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 15% 0%,#dceaff,transparent 42%),radial-gradient(ellipse at 90% 15%,#e8e2ff,transparent 35%),var(--bg);color:var(--ink);min-height:100vh;transition:.3s}
+body.night{--bg:#091225;--panel:rgba(20,33,59,.88);--panel2:#172744;--ink:#f3f7ff;--muted:#aab8d1;--line:rgba(210,225,255,.12);--shadow:0 16px 45px rgba(0,0,0,.22);background:radial-gradient(ellipse at 15% 0%,#1b3560,transparent 42%),radial-gradient(ellipse at 90% 15%,#30275e,transparent 35%),var(--bg)}
+button,input{font:inherit}button{cursor:pointer}.wrap{max-width:1440px;margin:auto;padding:22px}.top{display:flex;align-items:center;gap:16px;justify-content:space-between;margin-bottom:20px}.brand{display:flex;align-items:center;gap:11px;font-weight:850;font-size:1.35rem;letter-spacing:-.6px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#4aa8ff,#6559e9);display:grid;place-items:center;color:white;font-size:23px;box-shadow:0 8px 20px #477ff044}.brand small{display:block;color:var(--muted);font-size:.68rem;letter-spacing:1.8px;font-weight:700}.topright{display:flex;gap:9px;align-items:center}.pill,.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:13px;padding:10px 13px}.btn.primary{background:linear-gradient(120deg,var(--accent),var(--accent2));border:0;color:#fff;font-weight:750}.search{display:flex;gap:8px;max-width:560px;flex:1;margin:0 auto}.search input{min-width:0;flex:1;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 15px;color:var(--ink);outline:none}.search input:focus{border-color:var(--accent)}.greeting{display:flex;justify-content:space-between;align-items:end;margin:12px 2px 16px;gap:12px}.greeting h1{font-size:clamp(1.5rem,3vw,2.2rem);margin:0;letter-spacing:-1px}.greeting p{margin:5px 0 0;color:var(--muted)}.grid{display:grid;grid-template-columns:1.35fr .85fr .85fr;gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow);backdrop-filter:blur(18px);min-width:0}.hero{grid-column:span 2;min-height:245px;position:relative;overflow:hidden;background:linear-gradient(125deg,rgba(64,139,246,.19),rgba(112,91,226,.13)),var(--panel)}.hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:5%;top:-95px;background:radial-gradient(circle,#79baff55,transparent 68%);pointer-events:none}.eyebrow{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:800}.place{font-size:1.15rem;font-weight:750;margin-top:7px}.heroRow{display:flex;align-items:center;gap:25px;margin-top:12px}.temp{font-size:clamp(4rem,8vw,6rem);font-weight:800;letter-spacing:-6px;line-height:1}.weatherIcon{font-size:4.5rem;filter:drop-shadow(0 8px 12px #3b68a833)}.condition{font-size:1.12rem;font-weight:700}.muted{color:var(--muted)}.highlow{margin-top:7px;color:var(--muted);font-size:.92rem}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px}.stat span{display:block;color:var(--muted);font-size:.75rem}.stat b{display:block;margin-top:5px;font-size:1.05rem}.sectionHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:13px}.sectionHead h2{font-size:1rem;margin:0}.hourly{display:flex;gap:10px;overflow:auto;padding-bottom:4px}.hour{flex:0 0 66px;text-align:center;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px 6px}.hour .ico{font-size:1.35rem;margin:7px 0}.hour small{color:var(--muted)}.days{display:grid;gap:8px}.day{display:grid;grid-template-columns:1fr 35px 45px 55px;gap:8px;align-items:center;font-size:.9rem}.day .ico{text-align:center}.bar{height:6px;border-radius:10px;background:linear-gradient(90deg,#55b9f5,#f2bd5a)}.mapCard{grid-column:span 2}.map{height:270px;border-radius:15px;overflow:hidden;background:#dce7f5}.mapNote{font-size:.78rem;color:var(--muted);margin-top:9px}.alerts{display:grid;gap:9px}.alert{padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}.alert b{display:block;font-size:.9rem}.alert p{font-size:.8rem;color:var(--muted);margin:5px 0 0;line-height:1.4}.alert a,.links a{color:var(--accent);text-decoration:none;font-weight:700}.favs{display:flex;flex-wrap:wrap;gap:7px}.fav{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:999px;padding:8px 11px}.tools{display:flex;flex-wrap:wrap;gap:8px}.tool{border:1px solid var(--line);border-radius:13px;background:var(--panel2);color:var(--ink);padding:10px 12px}.tool.active{border-color:var(--accent);box-shadow:0 0 0 2px #3678f622}.footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.75rem;padding:18px 3px}.notice{font-size:.78rem;color:var(--muted);line-height:1.45}.status{font-size:.75rem;color:var(--muted)}.hidden{display:none!important}.bigtext{font-size:1.05rem;line-height:1.6}.focus:focus-visible,button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #65a5ff;outline-offset:3px}
+@media(max-width:980px){.grid{grid-template-columns:1fr 1fr}.hero{grid-column:span 2}.mapCard{grid-column:span 2}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.wrap{padding:13px}.top{flex-wrap:wrap}.brand{font-size:1.1rem}.search{order:3;flex-basis:100%;max-width:none}.topright{margin-left:auto}.greeting{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.hero,.mapCard{grid-column:span 1}.hero{min-height:225px}.heroRow{gap:14px}.temp{font-size:4.5rem}.weatherIcon{font-size:3.5rem}.stats{grid-template-columns:repeat(2,1fr)}.card{padding:15px}.map{height:230px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="brand"><div class="logo" aria-hidden="true">☀</div><div>SkyCast<small>WEATHER, MADE CLEARER</small></div></div>
+  <div class="search"><input id="search" aria-label="Search for a city" placeholder="Search any city or place…" autocomplete="off"><button class="btn primary" id="searchBtn">Search</button></div>
+  <div class="topright"><span class="pill" id="clock">Local time</span><button class="btn" id="themeBtn" aria-label="Toggle colour theme">☾</button></div>
+</header>
+<div class="greeting"><div><h1 id="greeting">Good day.</h1><p id="subtitle">Your world, at a glance.</p></div><div class="status" id="updated">Choose a location to begin</div></div>
+<main class="grid">
+<section class="card hero">
+ <div class="eyebrow">CURRENT CONDITIONS</div><div class="place" id="place">Worthing, United Kingdom</div>
+ <div class="heroRow"><div class="temp" id="temp">—°</div><div><div class="weatherIcon" id="icon">🌤️</div><div class="condition" id="condition">Getting your weather…</div><div class="highlow" id="highlow">Today’s high — / low —</div></div></div>
+ <div class="stats">
+  <div class="stat"><span>Feels like</span><b id="feels">—</b></div><div class="stat"><span>Wind</span><b id="wind">—</b></div><div class="stat"><span>Humidity</span><b id="humidity">—</b></div><div class="stat"><span>UV index</span><b id="uv">—</b></div>
+ </div>
+</section>
+<section class="card"><div class="sectionHead"><h2>Quick details</h2><span class="eyebrow">TODAY</span></div>
+ <div class="days" id="quick"><div class="muted">Loading forecast…</div></div>
+ <div style="height:12px"></div><div class="notice" id="sun">Sunrise and sunset: —</div>
+ <div style="height:12px"></div><button class="btn" id="saveFav">☆ Save this place</button>
+</section>
+<section class="card" style="grid-column:span 2"><div class="sectionHead"><h2>Next 24 hours</h2><span class="eyebrow">HOURLY FORECAST</span></div><div class="hourly" id="hourly"><span class="muted">Loading…</span></div></section>
+<section class="card"><div class="sectionHead"><h2>7-day outlook</h2><span class="eyebrow">DAILY</span></div><div class="days" id="daily"><div class="muted">Loading…</div></div></section>
+<section class="card mapCard"><div class="sectionHead"><h2>Live rain radar</h2><span class="eyebrow">RADAR LAYER</span></div><div id="map" class="map" role="application" aria-label="Interactive weather map"></div><div class="mapNote" id="radarStatus">Radar tiles load from RainViewer when available. Map © OpenStreetMap contributors.</div></section>
+<section class="card"><div class="sectionHead"><h2>Weather alerts</h2><span class="eyebrow">SAFETY FIRST</span></div><div class="alerts" id="alerts">
+ <div class="alert"><b>Check official local warnings</b><p>Weather-warning coverage differs by country. Always follow your local emergency services and official meteorological authority.</p><p><a href="https://www.metoffice.gov.uk/weather/warnings-and-advice/uk-warnings" target="_blank" rel="noopener">UK Met Office warnings ↗</a></p></div>
+ <div class="alert"><b>United States</b><p><a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service ↗</a></p></div>
+</div></section>
+<section class="card"><div class="sectionHead"><h2>Saved places</h2><span class="eyebrow">YOUR SHORTLIST</span></div><div class="favs" id="favs"><span class="muted">No saved places yet.</span></div><p class="notice">Saved on this device only. Account syncing can be added after a secure sign-in service is configured.</p></section>
+<section class="card"><div class="sectionHead"><h2>Weather toolkit</h2><span class="eyebrow">PERSONALISE</span></div><div class="tools"><button class="tool" id="unitsBtn">Units: °C</button><button class="tool" id="contrastBtn">High contrast</button><button class="tool" id="largeBtn">Larger text</button><button class="tool" id="shareBtn">Share weather</button><button class="tool" id="widgetBtn">Widget view</button></div><p class="notice" id="toolStatus">Choose an option to customise your dashboard.</p></section>
+<section class="card"><div class="sectionHead"><h2>Weather briefing</h2><span class="eyebrow">HELPFUL NOTES</span></div><div class="bigtext" id="briefing">Weather advice will appear here when your forecast loads.</div><p class="notice">Forecasts are guidance, not a substitute for official warnings.</p></section>
+<section class="card"><div class="sectionHead"><h2>Weather news & trusted sources</h2><span class="eyebrow">OFFICIAL UPDATES</span></div><div class="alerts links">
+ <div class="alert"><b>United Kingdom</b><p><a href="https://www.metoffice.gov.uk/" target="_blank" rel="noopener">Met Office forecasts and news ↗</a></p></div>
+ <div class="alert"><b>Worldwide</b><p><a href="https://wmo.int/" target="_blank" rel="noopener">World Meteorological Organization ↗</a></p></div>
+ <div class="alert"><b>United States</b><p><a href="https://www.weather.gov/news" target="_blank" rel="noopener">National Weather Service updates ↗</a></p></div>
+ </div><p class="notice">These are trusted source links, not an automated live news feed.</p></section>
+</main>
+<footer class="footer"><span>© <span id="year"></span> SkyCast · Weather for everyone.</span><span>Weather data: Open-Meteo · Radar: RainViewer · Map: OpenStreetMap</span><span id="dataStatus">Waiting for data</span></footer>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let place={name:"Worthing",country:"United Kingdom",lat:50.8179,lon:-0.3729,timezone:"Europe/London"};
+let data=null,units="C",map=null,radarLayer=null,highContrast=false,largeText=false;
+const codeMap={0:["Clear sky","☀️"],1:["Mainly clear","🌤️"],2:["Partly cloudy","⛅"],3:["Overcast","☁️"],45:["Fog","🌫️"],48:["Rime fog","🌫️"],51:["Light drizzle","🌦️"],53:["Drizzle","🌦️"],55:["Heavy drizzle","🌧️"],61:["Light rain","🌦️"],63:["Rain","🌧️"],65:["Heavy rain","🌧️"],71:["Light snow","🌨️"],73:["Snow","❄️"],75:["Heavy snow","❄️"],80:["Rain showers","🌦️"],81:["Rain showers","🌧️"],82:["Heavy showers","⛈️"],95:["Thunderstorm","⛈️"],96:["Thunderstorm and hail","⛈️"],99:["Severe thunderstorm","⛈️"]};
+function weather(code){return codeMap[code]||["Variable conditions","🌡️"]}
+function setTheme(){const h=new Date().getHours();document.body.classList.toggle("night",h>=19||h<6)}
+function tick(){const t=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",timeZone:place.timezone||undefined});$("clock").textContent=t+" local";const h=Number(new Intl.DateTimeFormat("en",{hour:"numeric",hourCycle:"h23",timeZone:place.timezone||undefined}).format(new Date()));$("greeting").textContent=(h<12?"Good morning":h<17?"Good afternoon":h<21?"Good evening":"Good night")+".";
+setTheme()}
+function fmtTemp(v){return Math.round(v)+(units==="C"?"°C":"°F")}
+function windFmt(v){return Math.round(units==="C"?v:v*0.621371)+(units==="C"?" km/h":" mph")}
+function render(){
+ if(!data)return;const c=data.current,d=data.daily,h=data.hourly;const w=weather(c.weather_code);
+ $("place").textContent=place.name+(place.country?", "+place.country:"");$("temp").textContent=fmtTemp(c.temperature_2m);$("icon").textContent=w[1];$("condition").textContent=w[0];$("feels").textContent=fmtTemp(c.apparent_temperature);$("wind").textContent=windFmt(c.wind_speed_10m);$("humidity").textContent=Math.round(c.relative_humidity_2m)+"%";$("uv").textContent=d.uv_index_max?.[0]??"—";
+ $("highlow").textContent="Today’s high "+fmtTemp(d.temperature_2m_max[0])+" / low "+fmtTemp(d.temperature_2m_min[0]);
+ $("sun").textContent="Sunrise "+new Date(d.sunrise[0]).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",timeZone:place.timezone})+" · Sunset "+new Date(d.sunset[0]).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",timeZone:place.timezone});
+ $("quick").innerHTML=[["Feels like",fmtTemp(c.apparent_temperature)],["Rain today",Math.round(d.precipitation_sum[0])+" mm"],["UV maximum",d.uv_index_max[0]],["Daylight",Math.round((new Date(d.sunset[0])-new Date(d.sunrise[0]))/3600000)+" hours"]].map(x=>`<div class="day"><span class="muted">${x[0]}</span><b style="grid-column:span 3;text-align:right">${x[1]}</b></div>`).join("");
+ const now=new Date();let start=h.time.findIndex(t=>new Date(t)>=now);if(start<0)start=0;
+ $("hourly").innerHTML=Array.from({length:24},(_,i)=>{let n=start+i;if(n>=h.time.length)return"";let tm=new Date(h.time[n]).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",timeZone:place.timezone});return `<div class="hour"><small>${tm}</small><div class="ico">${weather(h.weather_code[n])[1]}</div><b>${fmtTemp(h.temperature_2m[n])}</b><small>${Math.round(h.precipitation_probability[n]||0)}% rain</small></div>`}).join("");
+ $("daily").innerHTML=d.time.map((t,i)=>`<div class="day"><span>${i===0?"Today":new Date(t+"T12:00:00").toLocaleDateString([],{weekday:"short"})}</span><span class="ico">${weather(d.weather_code[i])[1]}</span><span>${fmtTemp(d.temperature_2m_min[i])}</span><div class="bar"></div><b style="text-align:right">${fmtTemp(d.temperature_2m_max[i])}</b></div>`).join("");
+ let advice="Conditions look changeable. Check the hourly forecast before heading out.";
+ if(c.precipitation>0||d.precipitation_sum[0]>5)advice="Rain is expected. Consider taking a waterproof layer and allow extra time for travel.";
+ else if(c.wind_speed_10m>35)advice="It is quite windy. Take care around exposed areas and secure loose outdoor items.";
+ else if(c.temperature_2m>=28)advice="It is warm. Drink water, seek shade when needed and take breaks from the sun.";
+ else if(c.temperature_2m<=3)advice="It is cold. Dress warmly and watch for icy conditions if temperatures are near freezing.";
+ else if(c.uv_index>=6)advice="UV levels are high. Use sun protection and seek shade around the middle of the day.";
+ $("briefing").textContent=advice;
+ $("updated").textContent="Updated "+new Date(c.time).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+" · "+place.timezone;
+ $("dataStatus").textContent="Live forecast loaded";
+}
+async function loadWeather(){
+ $("condition").textContent="Loading weather…";$("dataStatus").textContent="Fetching forecast";
+ const url=`https://api.open-meteo.com/v1/forecast?latitude=${place.lat}&longitude=${place.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,uv_index&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_sum&timezone=auto&forecast_days=7`;
+ try{const r=await fetch(url);if(!r.ok)throw Error("Weather service unavailable");data=await r.json();place.timezone=data.timezone;render();tick();initMap()}catch(e){$("condition").textContent="Weather temporarily unavailable";$("dataStatus").textContent="Could not load forecast";$("updated").textContent="Check your connection and try again."}
+}
+async function searchPlace(){const q=$("search").value.trim();if(!q)return; $("searchBtn").textContent="Searching…";try{const r=await fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(q)+"&count=1&language=en&format=json");const j=await r.json();if(!j.results?.length)throw Error("No matching place found");const p=j.results[0];place={name:p.name,country:p.country||"",lat:p.latitude,lon:p.longitude,timezone:p.timezone||"UTC"};$("subtitle").textContent="Weather conditions for your selected location.";await loadWeather()}catch(e){$("updated").textContent=e.message}finally{$("searchBtn").textContent="Search"}}
+function saveFav(){let a=JSON.parse(localStorage.getItem("skycast-favs")||"[]");if(!a.some(x=>x.name===place.name&&x.country===place.country)){a.push({name:place.name,country:place.country,lat:place.lat,lon:place.lon,timezone:place.timezone});localStorage.setItem("skycast-favs",JSON.stringify(a))}showFavs()}
+function showFavs(){let a=JSON.parse(localStorage.getItem("skycast-favs")||"[]");$("favs").innerHTML=a.length?a.map((x,i)=>`<button class="fav" data-i="${i}">${x.name} · ${x.country} ×</button>`).join(""):"<span class='muted'>No saved places yet.</span>";$("favs").querySelectorAll("button").forEach(b=>b.onclick=()=>{let a=JSON.parse(localStorage.getItem("skycast-favs")||"[]"),x=a[+b.dataset.i];if(x){place=x;loadWeather()}})}
+function initMap(){if(!window.L)return;if(!map){map=L.map("map",{scrollWheelZoom:false}).setView([place.lat,place.lon],7);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19}).addTo(map);L.marker([place.lat,place.lon]).addTo(map).bindPopup(place.name).openPopup()}else{map.setView([place.lat,place.lon],7);map.eachLayer(l=>{if(l instanceof L.Marker)map.removeLayer(l)});L.marker([place.lat,place.lon]).addTo(map).bindPopup(place.name)}loadRadar()}
+async function loadRadar(){try{const r=await fetch("https://api.rainviewer.com/public/weather-maps.json");const j=await r.json();const frames=j.radar?.past||[];if(!frames.length)throw Error("No radar frames");const f=frames[frames.length-1];if(radarLayer)map.removeLayer(radarLayer);radarLayer=L.tileLayer(j.host+f.path+"/256/{z}/{x}/{y}/2/1_1.png",{opacity:.58,attribution:"Radar © RainViewer"}).addTo(map);$("radarStatus").textContent="Radar overlay · latest available frame. Radar availability and coverage vary by region."}catch(e){$("radarStatus").textContent="Radar is temporarily unavailable. The interactive base map is still available."}}
+$("searchBtn").onclick=searchPlace;$("search").addEventListener("keydown",e=>{if(e.key==="Enter")searchPlace()});$("saveFav").onclick=saveFav;
+$("themeBtn").onclick=()=>{document.body.classList.toggle("night");$("toolStatus").textContent="Theme changed. Automatic local-time theme will resume on refresh."};
+$("unitsBtn").onclick=()=>{units=units==="C"?"F":"C";$("unitsBtn").textContent="Units: °"+units;render()};
+$("contrastBtn").onclick=()=>{highContrast=!highContrast;document.body.style.filter=highContrast?"contrast(1.18)":"none";$("contrastBtn").classList.toggle("active",highContrast)};
+$("largeBtn").onclick=()=>{largeText=!largeText;document.body.style.fontSize=largeText?"18px":"";$("largeBtn").classList.toggle("active",largeText)};
+$("shareBtn").onclick=async()=>{const s=`SkyCast weather for ${place.name}: ${$("temp").textContent}, ${$("condition").textContent}.`;try{if(navigator.share)await navigator.share({title:"SkyCast weather",text:s});else{await navigator.clipboard.writeText(s);$("toolStatus").textContent="Weather summary copied."}}catch(e){}};
+$("widgetBtn").onclick=()=>{document.body.classList.toggle("widgetmode");$("toolStatus").textContent="For a compact view, resize your browser window. A hosted embeddable widget can be added in a later release."};
+$("year").textContent=new Date().getFullYear();tick();setInterval(tick,30000);showFavs();loadWeather();
+</script>
+</body></html>
